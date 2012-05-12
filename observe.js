@@ -8,6 +8,7 @@
     }
 }(function () {
     var ob = {};
+    var global_dependencies = null;
 
     /**
      * Define an observable variable.
@@ -18,6 +19,11 @@
 
         var observable = function(value) {
             if (value === undefined) {
+                // Add to dependency chain if being tracked.
+                if (global_dependencies !== null) {
+                    global_dependencies.push(observable);
+                }
+
                 return _value;
             } else {
                 _value = value;
@@ -38,17 +44,32 @@
      * If write is not provided, variable is read-only.
      */
     ob.computed = function(read, write, context) {
+        var listeners = [];
+
         // Swap write and context if write is not a function.
         if (write !== undefined && typeof write !== 'function') {
             context = write;
             write = undefined;
         }
 
+        // Track dependencies.
+        global_dependencies = [];
         var _value = read.call(context);
-        var listeners = [];
+        for (var k = 0; k < global_dependencies.length; k++) {
+            global_dependencies[k].onchange(function() {
+                _value = read.call(context);
+                notifyListeners(listeners, _value);
+            });
+        }
+        global_dependencies = null;
 
         var computed = function() {
             if (arguments.length === 0) {
+                // Add to global dependencies if being tracked.
+                if (global_dependencies !== null) {
+                    global_dependencies.push(computed);
+                }
+
                 return _value;
             } else if (write === undefined) {
                 // TODO: Better error message.

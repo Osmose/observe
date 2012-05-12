@@ -107,4 +107,33 @@ define(function(require) {
         equal(keith.last_name, 'Wells');
         equal(keith.full_name(), 'Eric Wells');
     });
+
+    test('Computed variables automatically update if an observable it ' +
+         'depends upon updates.', function() {
+             var myvar = observable(1);
+             var myvar2 = computed(function() {
+                 return 1 + myvar();
+             });
+
+             equal(myvar2(), 2);
+
+             myvar(2);
+             equal(myvar2(), 3);
+         });
+
+    test('Computed variables can depend on other computed variables.',
+         function() {
+             var myvar = observable(1);
+             var myvar2 = computed(function() {
+                 return 1 + myvar();
+             });
+             var myvar3 = computed(function() {
+                 return 'myvar2 is ' + myvar2();
+             });
+
+             equal(myvar3(), 'myvar2 is 2');
+
+             myvar(2);
+             equal(myvar3(), 'myvar2 is 3');
+         });
 });

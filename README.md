@@ -2,6 +2,30 @@
 
 A tiny library for copying one of my favorite parts of KnockoutJS: observables.
 
+## The Magic
+
+The real magic here is dependency resolution: Computed variables can depend on
+other observables and computed variables, and will automatically update when
+their dependencies change:
+
+```javascript
+function Person(first_name, last_name) {
+    var self = this;
+    this.first_name = ob.observable(first_name);
+    this.last_name = ob.observable(last_name);
+    this.full_name = ob.computed(function() {
+        return this.first_name() + ' ' + this.last_name();
+    }, this);
+
+    this.full_name.onchange(function() {
+        console.log('Name has changed to ' + self.full_name());
+    });
+}
+
+var mike = new Person('Michael', 'Kelly');
+mike.first_name('Mike') // Changes full_name, which logs the name to the console.
+```
+
 ## Observables
 
 ```javascript
