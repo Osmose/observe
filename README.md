@@ -6,7 +6,7 @@ A tiny library for copying one of my favorite parts of KnockoutJS: observables.
 
 ```javascript
 // Create an observable
-var myvar = observable(1);
+var myvar = ob.observable(1);
 
 // Read the value
 console.log('Value of myvar is ' + myvar());
@@ -17,6 +17,12 @@ myvar(2);
 // Register a listener
 myvar.onchange(function(new_value) {
     console.log('Value changed to ' + new_value);
+});
+
+// Load observe via AMD
+define(function(require) {
+    var ob = require('observe');
+    var myvar = ob.observable(1);
 });
 ```
 

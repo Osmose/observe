@@ -1,8 +1,18 @@
-define(function(require, exports) {
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(factory);
+    } else {
+        // Browser globals
+        window.ob = factory();
+    }
+}(function () {
+    var ob = {};
+
     /**
      * Define an observable variable.
      */
-    exports.observable = function(initial_value) {
+    ob.observable = function(initial_value) {
         var _value = initial_value;
         var listeners = [];
 
@@ -27,4 +37,6 @@ define(function(require, exports) {
 
         return observable;
     };
-});
+
+    return ob;
+}));
