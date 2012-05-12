@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+
+    <title>Observe Tests</title>
+
+    <link rel="stylesheet" href="qunit.css">
+
+    <script src="qunit.js"></script>
+    <script src="require.js"></script>
+
+    <script>
+      QUnit.config.autostart = false;
+
+      require.config({
+          paths: {
+              observe: '../observe'
+          }
+      });
+      require(['tests.js'], function() {
+          QUnit.start();
+      });
+    </script>
+  </head>
+  <body>
+    <h1 id="qunit-header">Observe Tests</h1>
+    <h2 id="qunit-banner"></h2>
+    <div id="qunit-testrunner-toolbar"></div>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+    <div id="qunit-fixture">
+      <!-- Test Markup -->
+    </div>
+  </body>
+</html>
