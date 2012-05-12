@@ -1,5 +1,6 @@
 define(function(require) {
     var observable = require('observe').observable;
+    var computed = require('observe').computed;
 
     test('An observable stores a normal value correctly.', function() {
         var myvar = observable(1);
@@ -25,5 +26,85 @@ define(function(require) {
 
         myvar(5);
         equal(new_value, 5);
+    });
+
+    test('You can create a computed variable.', function() {
+        var first_name = 'Michael';
+        var last_name = 'Kelly';
+
+        var full_name = computed(function() {
+            return first_name + ' ' + last_name;
+        });
+
+        equal(full_name(), 'Michael Kelly');
+    });
+
+    test('You can create a writable computed variable.', function() {
+        var first_name = 'Michael';
+        var last_name = 'Kelly';
+
+        var full_name = computed(function() {
+            return first_name + ' ' + last_name;
+        }, function(name) {
+            var names = name.split(' ', 2);
+            first_name = names[0];
+            last_name = names[1];
+        });
+
+        full_name('Keith Johnson');
+        equal(first_name, 'Keith');
+        equal(last_name, 'Johnson');
+        equal(full_name(), 'Keith Johnson');
+    });
+
+    test('You can register listeners on a computed variable.', function() {
+        var stored = 2;
+        var myvar = computed(function() {
+            return 1 + stored;
+        }, function(value) {
+            stored = value;
+        });
+
+        var listened_value = null;
+        myvar.onchange(function(new_value) {
+            listened_value = new_value;
+        });
+
+        myvar(4);
+        equal(listened_value, 5);
+    });
+
+    test('Computed variables can take a context argument.', function() {
+        function Person(first_name, last_name) {
+            this.first_name = first_name;
+            this.last_name = last_name;
+            this.full_name = computed(function() {
+                return this.first_name + ' ' + this.last_name;
+            }, this);
+        }
+
+        var mike = new Person('Michael', 'Kelly');
+        equal(mike.full_name(), 'Michael Kelly');
+
+        // Test context with a write function.
+        function Person2(first_name, last_name) {
+            this.first_name = first_name;
+            this.last_name = last_name;
+            this.full_name = computed(function() {
+                return this.first_name + ' ' + this.last_name;
+            }, function(name) {
+                var names = name.split(' ', 2);
+                this.first_name = names[0];
+                this.last_name = names[1];
+            }, this);
+        }
+
+        var keith = new Person2('Keith', 'Johnson');
+        equal(keith.full_name(), 'Keith Johnson');
+
+        keith.full_name('Eric Wells');
+        equal(keith.first_name, 'Eric');
+        equal(keith.last_name, 'Wells');
+        equal(keith.full_name(), 'Eric Wells');
     });
 });

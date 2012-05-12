@@ -19,6 +19,35 @@ myvar.onchange(function(new_value) {
     console.log('Value changed to ' + new_value);
 });
 
+
+// Create a computed variable
+var first_name = 'Michael';
+var last_name = 'Kelly';
+var full_name = ob.computed(function() {
+    return first_name + ' ' + last_name;
+});
+full_name(); // = 'Michael Kelly'
+
+// Create a writable computed variable
+var my_value = 1;
+var myvar = ob.computed(function() {
+    return 1 + my_value;
+}, function(value) {
+    my_value = value;
+});
+myvar(2); // myvar() = 1 + 2 = 3
+
+// Specify value of `this` (3rd argument if writable)
+function Person(first_name, last_name) {
+    this.first_name = first_name;
+    this.last_name = last_name;
+    this.full_name = computed(function() {
+        return this.first_name + ' ' + this.last_name;
+    }, this);
+}
+new Person('Michael', 'Kelly').full_name(); // = 'Michael Kelly'
+
+
 // Load observe via AMD
 define(function(require) {
     var ob = require('observe');
