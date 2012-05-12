@@ -2,7 +2,7 @@
 
 A tiny library for copying one of my favorite parts of KnockoutJS: observables.
 
-## Example
+## Observables
 
 ```javascript
 // Create an observable
@@ -18,8 +18,11 @@ myvar(2);
 myvar.onchange(function(new_value) {
     console.log('Value changed to ' + new_value);
 });
+```
 
+## Computed Variables
 
+```javascript
 // Create a computed variable
 var first_name = 'Michael';
 var last_name = 'Kelly';
@@ -46,8 +49,11 @@ function Person(first_name, last_name) {
     }, this);
 }
 new Person('Michael', 'Kelly').full_name(); // = 'Michael Kelly'
+```
 
+## Misc
 
+```javascript
 // Load observe via AMD
 define(function(require) {
     var ob = require('observe');
