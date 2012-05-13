@@ -44,6 +44,7 @@
      * If write is not provided, variable is read-only.
      */
     ob.computed = function(read, write, context) {
+        var changed = false;
         var listeners = [];
 
         // Swap write and context if write is not a function.
@@ -52,22 +53,17 @@
             write = undefined;
         }
 
-        // Track dependencies.
-        global_dependencies = [];
-        var _value = read.call(context);
-        for (var k = 0; k < global_dependencies.length; k++) {
-            global_dependencies[k].onchange(function() {
-                _value = read.call(context);
-                notifyListeners(listeners, _value);
-            });
-        }
-        global_dependencies = null;
-
         var computed = function() {
             if (arguments.length === 0) {
                 // Add to global dependencies if being tracked.
                 if (global_dependencies !== null) {
                     global_dependencies.push(computed);
+                }
+
+                // Check for lazy evaluation.
+                if (computed.lazy === true && changed === true) {
+                    _value = read.call(context);
+                    notifyListeners(listeners, _value);
                 }
 
                 return _value;
@@ -83,7 +79,24 @@
             }
         };
 
+        computed.lazy = false; // If true, does not evaluate the new value
+                               // after a dependency changes until this is read.
         computed.onchange = createOnChange(listeners);
+
+        // Track dependencies.
+        global_dependencies = [];
+        var _value = read.call(context);
+        for (var k = 0; k < global_dependencies.length; k++) {
+            global_dependencies[k].onchange(function() {
+                if (computed.lazy === true) {
+                    changed = true;
+                } else {
+                    _value = read.call(context);
+                    notifyListeners(listeners, _value);
+                }
+            });
+        }
+        global_dependencies = null;
 
         return computed;
     };

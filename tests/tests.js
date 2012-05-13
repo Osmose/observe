@@ -136,4 +136,25 @@ define(function(require) {
              myvar(2);
              equal(myvar3(), 'myvar2 is 3');
          });
+
+    test('Computed variables can be set to evaluate only when read.',
+         function() {
+             var called = 0;
+
+             var dependency = observable(1);
+             var myvar = computed(function() {
+                 called++;
+                 return dependency() + 1;
+             });
+             equal(called, 1);
+
+             dependency(2);
+             equal(called, 2);
+
+             myvar.lazy = true;
+             dependency(3);
+             equal(called, 2);
+             myvar();
+             equal(called, 3);
+         });
 });

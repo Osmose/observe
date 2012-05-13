@@ -73,6 +73,17 @@ function Person(first_name, last_name) {
     }, this);
 }
 new Person('Michael', 'Kelly').full_name(); // = 'Michael Kelly'
+
+// Create a lazy computed variable. Does not update when dependencies change,
+// only when read.
+var dependency = observable(1);
+var myvar = computed(function() {
+    return dependency() + 1;
+});
+myvar.lazy = true;
+
+dependency(2);
+myvar(); // myvar isn't reevaluated until this line.
 ```
 
 ## Misc
